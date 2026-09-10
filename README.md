@@ -1,150 +1,91 @@
-# 📊 Cloud-Deployed Customer Analytics & Predictive Platform
-## PyTorch Deep Learning, Serverless Container Deployment & Automated Campaign Triggers
+# 📊 Customer Insights Dashboard
+## Customer Segmentation, Spending Prediction & Analytics
 
-[![Live Streamlit App](https://img.shields.io/badge/Live-Streamlit%20App-red?style=flat&logo=streamlit)](https://customer-insights-1604.streamlit.app)
-[![GitHub Repository](https://img.shields.io/badge/GitHub-Repository-blue?style=flat&logo=github)](https://github.com/anuravi1604-cmd/customer-insights-dashboard)
-[![Docker Containerized](https://img.shields.io/badge/Docker-Containerized-blue?style=flat&logo=docker)](Dockerfile)
-[![AWS ECS Fargate](https://img.shields.io/badge/AWS-ECS%20Fargate%20Ready-orange?style=flat&logo=amazonwebservices)](cloud/aws_architecture.md)
-[![Azure Container Apps](https://img.shields.io/badge/Azure-Container%20Apps-blue?style=flat&logo=microsoftazure)](cloud/azure_architecture.md)
-[![PyTorch](https://img.shields.io/badge/PyTorch-Deep%20Learning-red?style=flat&logo=pytorch)](https://pytorch.org)
-[![Cloud Certifications](https://img.shields.io/badge/Cloud%20Certs-AWS%20%7C%20Azure-purple?style=flat)](CLOUD_CERTIFICATION_GUIDE.md)
+An interactive customer analytics application built with **Python, Streamlit, scikit-learn, PyTorch, FastAPI, and Docker**. The project explores customer segmentation, spending-score prediction, and a rule-based campaign recommendation workflow.
 
-A production-grade customer intelligence platform combining **PyTorch Deep Learning**, **FastAPI microservices**, an interactive **Streamlit dashboard**, and automated **Digital Marketing Campaign Triggers** deployed across **AWS ECS Fargate** and **Microsoft Azure**.
+> 🌐 **Live Streamlit App:** https://customer-insights-1604.streamlit.app
 
-> 🌐 **Live Streamlit App:** [https://customer-insights-1604.streamlit.app](https://customer-insights-1604.streamlit.app)
+## Key Features
 
----
+- **Customer Segmentation:** K-Means clustering groups customers into three behavioral cohorts based on annual income and spending score.
+- **Spending Prediction:** Compares a scikit-learn linear regression baseline with a PyTorch MLP model for spending-score prediction.
+- **Campaign Recommendations:** Applies rule-based eligibility logic to identify customers who may be suitable for retention or promotional campaigns. The current implementation generates recommendations and payload previews locally; it does **not** send real marketing messages.
+- **Containerization & CI:** Docker configuration supports reproducible local execution, while GitHub Actions installs dependencies, verifies the API/model modules, and builds the Docker image.
 
-## 🚀 Key Highlights & Architectural Levers
+## Current Deployment Status
 
-* **Cloud-Native Deployment (AWS & Azure):** Containerized multi-service architecture ready for serverless container deployment via **AWS ECS Fargate** (backed by ALB and S3 model checkpoints) or **Azure Container Apps (ACA)**. Full specifications in [AWS Architecture](cloud/aws_architecture.md) and [Azure Architecture](cloud/azure_architecture.md).
-* **Automated Retention Campaign Trigger (Digital Marketing):** Audience segmentation engine that automatically flags high-value VIP customers and at-risk cohorts, immediately dispatching personalized retention offers and dynamic discount codes via **Power Automate** and webhook integrations.
-* **PyTorch Deep Learning:** 2-layer Multi-Layer Perceptron (MLP) neural network (`CustomerSpendingMLP`) utilizing PyTorch `Dataset` & `DataLoader` pipelines with $L_2$ weight decay regularization for continuous spending regression.
-* **Unsupervised Customer Segmentation:** K-Means clustering assigning meaningful behavioral cohorts (*High-Value VIP*, *Growth Potential*, *Conservative Spender*).
-* **Cloud Certification Alignment:** Built alongside a high-yield study and interview defense roadmap for **AWS Certified Cloud Practitioner (CLF-C02)** and **Azure Fundamentals (AZ-900)**. Full guide in [CLOUD_CERTIFICATION_GUIDE.md](CLOUD_CERTIFICATION_GUIDE.md).
+**The Streamlit dashboard is deployed on Streamlit Community Cloud. The AWS and Azure files in this repository are architecture blueprints only — the application is not currently deployed to AWS ECS/Fargate or Azure Container Apps.**
 
----
+The repository should therefore be described as **Dockerized and cloud-ready by design**, not cloud-deployed.
 
-## ☁️ Cloud Architecture Blueprint (AWS ECS Fargate)
+## Architecture Blueprint
 
-```mermaid
-graph TD
-    Client([Internet User / Marketing Platform]) -->|HTTPS / 443| Route53[Amazon Route 53 DNS]
-    Route53 --> CloudFront[Amazon CloudFront CDN / WAF]
-    CloudFront --> ALB[Application Load Balancer]
+The `cloud/` directory contains proposed deployment designs for AWS ECS Fargate and Azure Container Apps. These documents describe how the application could be deployed in the future; they are not evidence of an active cloud deployment.
 
-    subgraph AWS VPC [Amazon VPC - Multi-AZ Architecture]
-        ALB -->|Port 8000: /api| ECS_FastAPI[AWS ECS Fargate: FastAPI Microservice]
-        ALB -->|Port 8501: /| ECS_Streamlit[AWS ECS Fargate: Streamlit Dashboard]
+## Technology Stack
 
-        ECS_FastAPI --> S3[(Amazon S3: PyTorch Model Weights)]
-        ECS_FastAPI --> CloudWatch[Amazon CloudWatch Monitoring]
-        
-        ECS_FastAPI -->|Retention Webhook| PowerAutomate[Microsoft Power Automate Flow]
-        PowerAutomate --> Outlook[Automated Retention Email Dispatch]
-    end
-```
+- **Languages & ML:** Python 3.11, PyTorch, scikit-learn, Pandas, NumPy
+- **Backend:** FastAPI, Uvicorn, Pydantic
+- **Frontend:** Streamlit
+- **DevOps:** Docker, Docker Compose, GitHub Actions
+- **Analytics:** K-Means clustering, Linear Regression, PyTorch MLP
 
----
+## Run Locally
 
-## ⚡ Automated Marketing Campaign Trigger Workflow
+### Docker Compose
 
-When customer spending and demographic signals are processed, the platform automatically evaluates campaign eligibility:
-
-```mermaid
-sequenceDiagram
-    autonumber
-    participant App as Streamlit / FastAPI Platform
-    participant Seg as K-Means Segmentation Engine
-    participant Trigger as Campaign Dispatcher
-    participant Webhook as Microsoft Power Automate
-    participant Customer as High-Value Customer
-
-    App->>Seg: Ingest Customer Profile (Income, Spending, Age)
-    Seg-->>App: Classified as "High-Value VIP" (AnnualIncome >= $65k & Score >= 60)
-    App->>Trigger: Evaluate Retention Campaign Eligibility
-    Trigger->>Webhook: Dispatches Webhook Payload (Discount Code: VIP-PLATINUM-25)
-    Webhook-->>Customer: Delivers Automated Personalized Retention Email & SMS
-```
-
----
-
-## 🛠️ Technology Stack
-* **Languages & ML:** Python 3.11, PyTorch, Scikit-learn, Pandas, NumPy
-* **Backend API:** FastAPI, Uvicorn, Pydantic
-* **Frontend UI:** Streamlit (Wide-screen responsive layout)
-* **Cloud & DevOps:** Docker, Docker Compose, AWS ECS Fargate, Azure Container Apps, GitHub Actions CI/CD
-* **Automation:** Microsoft Power Automate Webhooks, JSON Event Dispatching
-
----
-
-## 🏃 Quick Start: Run Locally
-
-### Option A: Run with Docker Compose
 ```bash
-# Build and start all microservices
 docker compose up --build
 
 # FastAPI API: http://localhost:8000
 # Streamlit Dashboard: http://localhost:8501
 ```
 
-### Option B: Standard Local Setup
+### Standard Python Setup
+
 ```bash
-# 1. Clone repository
 git clone https://github.com/anuravi1604-cmd/customer-insights-dashboard.git
 cd customer-insights-dashboard
-
-# 2. Install dependencies
 pip install -r requirements.txt
 
-# 3. Train PyTorch model
 python3 pytorch_model.py
-
-# 4. Start FastAPI server
 uvicorn api:app --reload --port 8000
 
-# 5. In another terminal, run Streamlit app
+# In another terminal
 streamlit run app.py
 ```
 
----
-
-## 📡 API Endpoints
+## API Endpoints
 
 | Method | Endpoint | Description |
 | :--- | :--- | :--- |
-| `GET` | `/health` | Service health status and container readiness |
-| `GET` | `/data` | Clustered and segmented customer records |
-| `POST` | `/predict/pytorch` | Deep learning inference for spending score prediction |
-| `POST` | `/campaign/trigger` | Dispatches automated retention campaign via Power Automate webhook |
-| `GET` | `/campaign/audiences`| Summary of active audience segments and campaign candidate counts |
+| `GET` | `/health` | API health status |
+| `GET` | `/data` | Customer records with segmentation and predictions |
+| `POST` | `/predict/pytorch` | PyTorch spending-score inference |
+| `POST` | `/campaign/trigger` | Evaluates campaign rules and returns a recommendation/payload preview |
+| `GET` | `/campaign/audiences` | Aggregated customer segment and campaign-eligibility counts |
 
----
+## Repository Structure
 
-## 📁 Repository Structure
-```
+```text
 customer-insights-dashboard/
 ├── cloud/
-│   ├── aws_architecture.md     # AWS ECS Fargate & CloudFormation specs
-│   └── azure_architecture.md   # Azure Container Apps & ACR specs
-├── .github/
-│   └── workflows/
-│       └── deploy.yml          # GitHub Actions CI/CD pipeline
-├── CLOUD_CERTIFICATION_GUIDE.md # AWS CLF-C02 & Azure AZ-900 interview defense
-├── api.py                      # FastAPI microservice with campaign endpoints
-├── app.py                      # Interactive Streamlit analytics & trigger UI
-├── model.py                    # K-Means clustering & campaign logic
-├── pytorch_model.py            # PyTorch MLP neural network implementation
-├── customer_model.pth          # Serialized PyTorch model checkpoint
-├── scaler_params.npz           # Feature standardizer weights
-├── data.csv                    # Customer demographic & spending database
-├── Dockerfile                  # Container build specification
-├── docker-compose.yml          # Multi-service local composition
-└── README.md                   # Complete architectural documentation
+│   ├── aws_architecture.md       # Proposed AWS deployment blueprint
+│   └── azure_architecture.md     # Proposed Azure deployment blueprint
+├── .github/workflows/
+│   └── deploy.yml                # CI: dependency check, module verification & Docker build
+├── api.py                         # FastAPI service
+├── app.py                         # Streamlit dashboard
+├── model.py                       # K-Means segmentation & campaign rules
+├── pytorch_model.py               # PyTorch MLP implementation
+├── customer_model.pth             # Trained PyTorch checkpoint
+├── scaler_params.npz              # Model preprocessing parameters
+├── data.csv                       # Customer dataset
+├── Dockerfile                     # Container definition
+├── docker-compose.yml              # Local multi-service setup
+└── README.md
 ```
 
----
+## License
 
-## 📄 License
 MIT License. Developed by Anushka.
