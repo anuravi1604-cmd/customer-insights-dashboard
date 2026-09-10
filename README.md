@@ -1,6 +1,7 @@
 # 📊 Cloud-Deployed Customer Analytics & Predictive Platform
 ## PyTorch Deep Learning, Serverless Container Deployment & Automated Campaign Triggers
 
+[![Live Streamlit App](https://img.shields.io/badge/Live-Streamlit%20App-red?style=flat&logo=streamlit)](https://customer-insights-1604.streamlit.app)
 [![GitHub Repository](https://img.shields.io/badge/GitHub-Repository-blue?style=flat&logo=github)](https://github.com/anuravi1604-cmd/customer-insights-dashboard)
 [![Docker Containerized](https://img.shields.io/badge/Docker-Containerized-blue?style=flat&logo=docker)](Dockerfile)
 [![AWS ECS Fargate](https://img.shields.io/badge/AWS-ECS%20Fargate%20Ready-orange?style=flat&logo=amazonwebservices)](cloud/aws_architecture.md)
@@ -9,6 +10,8 @@
 [![Cloud Certifications](https://img.shields.io/badge/Cloud%20Certs-AWS%20%7C%20Azure-purple?style=flat)](CLOUD_CERTIFICATION_GUIDE.md)
 
 A production-grade customer intelligence platform combining **PyTorch Deep Learning**, **FastAPI microservices**, an interactive **Streamlit dashboard**, and automated **Digital Marketing Campaign Triggers** deployed across **AWS ECS Fargate** and **Microsoft Azure**.
+
+> 🌐 **Live Streamlit App:** [https://customer-insights-1604.streamlit.app](https://customer-insights-1604.streamlit.app)
 
 ---
 
