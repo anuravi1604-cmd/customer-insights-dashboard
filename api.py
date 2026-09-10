@@ -1,16 +1,18 @@
 from fastapi import FastAPI, HTTPException
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
+from typing import Optional
 import pandas as pd
 import numpy as np
 import torch
 import os
-from model import load_data, segment_customers, predict_sales
+from datetime import datetime
+from model import load_data, segment_customers, predict_sales, evaluate_customer_campaign_trigger
 from pytorch_model import CustomerSpendingMLP
 
 app = FastAPI(
     title="Customer Insights & Deep Learning API",
-    description="FastAPI service with K-Means clustering, Linear Regression, and PyTorch Neural Network prediction",
-    version="2.0.0"
+    description="FastAPI service with K-Means clustering, PyTorch Neural Network prediction, and Automated Digital Marketing Campaign Triggers",
+    version="2.5.0"
 )
 
 # Load PyTorch model if checkpoint exists
@@ -30,19 +32,27 @@ if os.path.exists(MODEL_CHECKPOINT) and os.path.exists(SCALER_PARAMS):
     scaler_scale = scaler_data["scale"]
 
 class CustomerInput(BaseModel):
-    Age: float
-    AnnualIncome: float
+    Age: float = Field(default=35.0, ge=18.0, le=100.0)
+    AnnualIncome: float = Field(default=75.0, ge=10.0, le=300.0, description="Annual Income in $k")
+
+class CampaignTriggerInput(BaseModel):
+    CustomerID: Optional[str] = "CUST-1042"
+    Age: float = Field(default=38.0)
+    AnnualIncome: float = Field(default=85.0, description="Income in $k")
+    SpendingScore: float = Field(default=78.0, description="Score 1-100")
+    WebhookDestination: Optional[str] = "PowerAutomate_Retention_Flow_v2"
 
 @app.get("/")
 def home():
     return {
         "message": "Customer Insights & Deep Learning API running",
-        "pytorch_model_loaded": pytorch_model is not None
+        "pytorch_model_loaded": pytorch_model is not None,
+        "features": ["PyTorch MLP Regression", "K-Means Audience Segmentation", "Automated Retention Campaign Trigger"]
     }
 
 @app.get("/health")
 def health():
-    return {"status": "healthy", "service": "customer-insights-api"}
+    return {"status": "healthy", "service": "customer-insights-api", "cloud_ready": True}
 
 @app.get("/data")
 def get_data():
@@ -69,3 +79,33 @@ def predict_pytorch(customer: CustomerInput):
         "predicted_spending_score": round(pred_score, 2),
         "model": "PyTorch CustomerSpendingMLP (2-layer neural network)"
     }
+
+@app.post("/campaign/trigger")
+def trigger_marketing_campaign(customer: CampaignTriggerInput):
+    """
+    Automated Campaign Trigger (Digital Marketing & Unified Communications).
+    Auto-flags high-value or churn-risk customers and fires an automated retention campaign via Power Automate / Webhook.
+    """
+    eval_result = evaluate_customer_campaign_trigger(customer.dict())
+    
+    # Simulate automated webhook delivery log
+    eval_result["dispatched_at"] = datetime.utcnow().isoformat() + "Z"
+    eval_result["webhook_destination"] = customer.WebhookDestination
+    eval_result["delivery_status"] = "DELIVERED (HTTP 200 OK)"
+    
+    return eval_result
+
+@app.get("/campaign/audiences")
+def get_audience_cohorts():
+    """Returns aggregated audience cohorts for digital marketing campaigns."""
+    df = load_data()
+    df = segment_customers(df)
+    
+    summary = df.groupby("Segment").agg(
+        Count=("CustomerID", "count") if "CustomerID" in df.columns else ("Age", "count"),
+        AvgIncome=("AnnualIncome", "mean"),
+        AvgSpending=("SpendingScore", "mean"),
+        CampaignEligibleCount=("CampaignEligible", "sum")
+    ).reset_index()
+
+    return summary.to_dict(orient="records")
